@@ -13,3 +13,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/image/{messageId}.gif', 'App\Http\Controllers\HitController@pixel');
