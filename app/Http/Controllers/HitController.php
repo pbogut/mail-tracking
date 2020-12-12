@@ -44,4 +44,26 @@ class HitController extends Controller
             'Expires' => 0
         ]);
     }
+
+    public function hitlog(Request $request)
+    {
+        $from = $request->from;
+        $fromDate = Carbon::parse($from);
+
+        $hits = HitLog::query()
+            ->where('updated_at', '>', $fromDate)
+            ->orderBy('updated_at', 'ASC')
+            ->get();
+
+        if ($request->unique) {
+            $tmpHits = $hits;
+            $hits = [];
+            foreach ($tmpHits as $hit) {
+                $hits[$hit->message_id] = $hit;
+            }
+            $hits = array_values($hits);
+        }
+
+        return $hits;
+    }
 }
