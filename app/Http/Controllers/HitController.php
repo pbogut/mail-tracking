@@ -66,4 +66,41 @@ class HitController extends Controller
 
         return $hits;
     }
+
+    public function summary($messageId)
+    {
+        $messageId = trim(base64_decode($messageId), '<>');
+
+        $hits = HitLog::query()
+            ->where('message_id', '=', $messageId)
+            ->orderBy('updated_at', 'ASC')
+            ->get();
+
+        $firstOpen = null;
+        $lastOpen = null;
+        $results = [];
+        foreach ($hits as $hit) {
+            $firstOpen = $hit->updated_at->format('Y-m-d H:i:s');
+            $lastOpen = $lastOpen ?: $firstOpen;
+
+            $key = "{$hit->user_agent}::{$hit->ip_address}";
+            $entry = $results[$key] ?? [
+                'user_agent' => $hit->user_agent,
+                'ip_address' => $hit->ip_address,
+                'last_hit' => $hit->updated_at->format('Y-m-d H:i:s'),
+                'hits_count' => 0,
+            ];
+            $entry['hits_count']++;
+            $results[$key] = $entry;
+
+        }
+
+        return [
+            'opened' => !empty($results),
+            'message_id' => $messageId,
+            'last_open' => $firstOpen,
+            'first_open' => $lastOpen,
+            'hits' => array_values($results),
+        ];
+    }
 }

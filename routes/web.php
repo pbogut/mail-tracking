@@ -19,3 +19,5 @@ Route::get('/image/{messageId}.gif', 'App\Http\Controllers\HitController@pixel')
 // simple api
 Route::get('/rest/hitlog', 'App\Http\Controllers\HitController@hitlog')
     ->middleware(AuthToken::class);
+Route::get('/rest/summary/{messageId}', 'App\Http\Controllers\HitController@summary')
+    ->middleware(AuthToken::class);
